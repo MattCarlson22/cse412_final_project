@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+    <rect width="200" height="200" fill="#000080"/>
+    <circle cx="100" cy="100" r="80" fill="#1a1a1a" stroke="#444" stroke-width="2"/>
+    <circle cx="100" cy="100" r="70" fill="none" stroke="#222" stroke-width="1"/>
+    <circle cx="100" cy="100" r="55" fill="none" stroke="#222" stroke-width="1"/>
+    <circle cx="100" cy="100" r="40" fill="none" stroke="#222" stroke-width="1"/>
+    <circle cx="100" cy="100" r="22" fill="#c0392b"/>
+    <circle cx="100" cy="100" r="3" fill="#000"/>
+    <text x="100" y="190" font-family="monospace" font-size="10"
+          text-anchor="middle" fill="#c0c0c0">NO COVER</text>
+</svg>

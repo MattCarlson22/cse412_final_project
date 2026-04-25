@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block window_title %}Home{% endblock %}
+{% block status_left %}{{ releases|length }} releases on file{% endblock %}
+
+{% block content %}
+<section class="welcome-panel">
+    <fieldset>
+        <legend>Welcome</legend>
+        {% if current_user %}
+            <p>Welcome back, <strong>{{ current_user }}</strong>! Browse the
+                library below or jump into your collections.</p>
+        {% else %}
+            <p>Welcome to the Music Library. Browse releases below, or
+                <a href="{{ url_for('login') }}">log in</a> to manage your
+                personal collections.</p>
+        {% endif %}
+    </fieldset>
+</section>
+
+<section class="search-panel">
+    <fieldset>
+        <legend>Search</legend>
+        <form onsubmit="event.preventDefault(); alert('Search is not wired up yet.');">
+            <div class="field-row">
+                <label for="q">Find a release:</label>
+                <input id="q" type="text" placeholder="Title, artist, label...">
+                <button type="submit">Go</button>
+            </div>
+        </form>
+    </fieldset>
+</section>
+
+{% if current_user %}
+<section class="collections-panel">
+    <fieldset>
+        <legend>Your Collections</legend>
+        <div class="collection-grid">
+            {% for c in collections %}
+                <div class="window collection-card">
+                    <div class="title-bar">
+                        <div class="title-bar-text">{{ c.name }}</div>
+                    </div>
+                    <div class="window-body">
+                        <p>{{ c.release_ids|length }} releases</p>
+                        <a href="{{ url_for('collection_detail', c_id=c.c_id) }}">
+                            <button>Open</button>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="window collection-card collection-card-new">
+                <div class="title-bar">
+                    <div class="title-bar-text">+ New</div>
+                </div>
+                <div class="window-body">
+                    <p>Start a new collection.</p>
+                    <button>Create</button>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</section>
+{% endif %}
+
+<section class="releases-panel">
+    <fieldset>
+        <legend>Browse Releases</legend>
+        <div class="release-grid">
+            {% for r in releases %}
+                <div class="window release-card">
+                    <div class="title-bar">
+                        <div class="title-bar-text">{{ r.title }}</div>
+                    </div>
+                    <div class="window-body release-card-body">
+                        <img src="{{ r.cover }}" alt="{{ r.title }} cover"
+                             class="release-cover"
+                             onerror="this.style.display='none'">
+                        <p class="release-artist">{{ r.contributors }}</p>
+                        <p class="release-meta">
+                            {{ r.r_date[:4] }} &middot; {{ r.format }} &middot; {{ r.genre }}
+                        </p>
+                        <p class="release-label">{{ r.r_label }}</p>
+                        <div class="release-actions">
+                            <a href="{{ url_for('release_detail', release_id=r.id) }}">
+                                <button>Details</button>
+                            </a>
+                            {% if current_user %}
+                                <button>Add to Collection</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </fieldset>
+</section>
+{% endblock %}

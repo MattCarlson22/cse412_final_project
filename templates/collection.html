@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}{{ collection.name }} — Music Library{% endblock %}
+{% block window_title %}{{ collection.name }}{% endblock %}
+{% block status_left %}{{ releases|length }} releases in this collection{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('home') }}"><button>&laquo; Back to Library</button></a>
+
+<section style="margin-top: 10px;">
+    <fieldset>
+        <legend>Collection #{{ collection.c_id }}</legend>
+        <p><strong>{{ collection.name }}</strong> &mdash; {{ releases|length }} releases</p>
+        {% if current_user %}
+            <button>Rename</button>
+            <button>Delete Collection</button>
+        {% endif %}
+    </fieldset>
+</section>
+
+<section style="margin-top: 10px;">
+    <fieldset>
+        <legend>Releases</legend>
+        {% if releases %}
+        <table class="collection-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Artist</th>
+                    <th>Year</th>
+                    <th>Format</th>
+                    <th>Genre</th>
+                    <th>Tracks</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in releases %}
+                <tr class="{{ 'track-row-alt' if loop.index is even }}">
+                    <td>
+                        <a href="{{ url_for('release_detail', release_id=r.id) }}">
+                            {{ r.title }}
+                        </a>
+                    </td>
+                    <td>{{ r.contributors }}</td>
+                    <td>{{ r.r_date[:4] }}</td>
+                    <td>{{ r.format }}</td>
+                    <td>{{ r.genre }}</td>
+                    <td>{{ r.tracks|length }}</td>
+                    <td>
+                        <a href="{{ url_for('release_detail', release_id=r.id) }}">
+                            <button>View</button>
+                        </a>
+                        {% if current_user %}
+                            <button>Remove</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>This collection has no releases yet.</p>
+        {% endif %}
+
+        {% if current_user %}
+        <div style="margin-top: 10px;">
+            <a href="{{ url_for('home') }}"><button>+ Add Releases</button></a>
+        </div>
+        {% endif %}
+    </fieldset>
+</section>
+
+<section style="margin-top: 10px;">
+    <fieldset>
+        <legend>Stats</legend>
+        <table class="info-table">
+            <tr>
+                <th>Total releases</th>
+                <td>{{ releases|length }}</td>
+            </tr>
+            <tr>
+                <th>Total tracks</th>
+                <td>{{ stats.total_tracks }}</td>
+            </tr>
+            <tr>
+                <th>Formats</th>
+                <td>{{ stats.formats|join(', ') }}</td>
+            </tr>
+            <tr>
+                <th>Genres</th>
+                <td>{{ stats.genres|join(', ') }}</td>
+            </tr>
+        </table>
+    </fieldset>
+</section>
+{% endblock %}

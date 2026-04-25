@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Login — Music Library{% endblock %}
+{% block window_title %}Login{% endblock %}
+{% block status_left %}Authenticate to continue{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="window auth-dialog">
+        <div class="title-bar">
+            <div class="title-bar-text">Login</div>
+            <div class="title-bar-controls">
+                <button aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="window-body">
+            <form method="post" action="{{ url_for('login') }}">
+                <fieldset>
+                    <legend>Credentials</legend>
+                    <div class="field-row-stacked">
+                        <label for="username">Username</label>
+                        <input id="username" name="username" type="text"
+                               required autofocus>
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="password">Password</label>
+                        <input id="password" name="password" type="password"
+                               required>
+                    </div>
+                </fieldset>
+                <section class="auth-actions">
+                    <button type="submit">Login</button>
+                    <a href="{{ url_for('home') }}"><button type="button">Cancel</button></a>
+                </section>
+            </form>
+            <p class="auth-footer">
+                No account? <a href="{{ url_for('register') }}">Register here</a>.
+            </p>
+            <p class="auth-hint">
+                <em>Hint: try <code>jdoe</code> / <code>pass123</code></em>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

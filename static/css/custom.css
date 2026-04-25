@@ -1,0 +1,314 @@
+/* Tweaks layered on top of 98.css for the music library frontend. */
+
+/* Classic Win9X teal desktop background. */
+body {
+    margin: 0;
+    background-color: #008080;
+    min-height: 100vh;
+    padding: 24px 16px;
+}
+
+.desktop {
+    display: flex;
+    justify-content: center;
+}
+
+/* Main app window — wide enough to show a release grid. */
+.app-window {
+    width: 100%;
+    max-width: 1100px;
+}
+
+/* Body of the main window: light gray fill, slightly more padding. */
+.app-window-body {
+    padding: 12px;
+    background-color: #c0c0c0;
+}
+
+/* ---------- Menu bar ---------- */
+
+.menu-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 4px;
+    background-color: #c0c0c0;
+    border-bottom: 1px solid #808080;
+    font-family: "Pixelated MS Sans Serif", Arial, sans-serif;
+    font-size: 11px;
+}
+
+.menu-item {
+    color: #000;
+    text-decoration: none;
+    padding: 2px 8px;
+    cursor: pointer;
+}
+
+.menu-item:hover {
+    background-color: #000080;
+    color: #fff;
+}
+
+.menu-spacer {
+    flex: 1;
+}
+
+.menu-form {
+    display: inline;
+    margin: 0;
+}
+
+.menu-form button {
+    min-width: 64px;
+}
+
+.user-chip {
+    cursor: default;
+}
+
+.user-chip:hover {
+    background-color: transparent;
+    color: #000;
+}
+
+/* ---------- Flash messages ---------- */
+
+.flash-area {
+    margin-bottom: 12px;
+}
+
+.flash {
+    margin: 4px 0;
+    padding: 4px 6px;
+}
+
+.flash-success {
+    background-color: #d4f0d4;
+}
+
+.flash-error {
+    background-color: #f0d4d4;
+}
+
+/* ---------- Home page panels ---------- */
+
+.welcome-panel,
+.search-panel,
+.collections-panel,
+.releases-panel {
+    margin-bottom: 12px;
+}
+
+/* ---------- Releases grid ---------- */
+
+.release-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    padding: 4px;
+}
+
+.release-card {
+    width: auto;
+}
+
+.release-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.release-cover {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border: 1px solid #808080;
+    background-color: #000;
+}
+
+.release-artist {
+    font-weight: bold;
+    margin: 0;
+}
+
+.release-meta,
+.release-label {
+    margin: 0;
+    font-size: 11px;
+}
+
+.release-actions {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.release-actions button {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ---------- Collections grid ---------- */
+
+.collection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    padding: 4px;
+}
+
+.collection-card {
+    width: auto;
+}
+
+.collection-card-new .title-bar {
+    background: linear-gradient(90deg, #000080, #1084d0);
+}
+
+/* ---------- Auth pages ---------- */
+
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 32px 8px;
+}
+
+.auth-dialog {
+    width: 360px;
+}
+
+.auth-dialog fieldset {
+    margin-bottom: 12px;
+}
+
+.auth-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.auth-actions a {
+    text-decoration: none;
+}
+
+.auth-footer,
+.auth-hint {
+    margin: 8px 0 0;
+    font-size: 11px;
+    text-align: center;
+}
+
+.auth-hint code {
+    background-color: #fff;
+    padding: 0 2px;
+    border: 1px solid #808080;
+}
+
+/* ---------- Release detail page ---------- */
+
+.detail-layout {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+    align-items: flex-start;
+}
+
+.detail-left {
+    flex: 0 0 220px;
+}
+
+.detail-right {
+    flex: 1;
+    min-width: 0;
+}
+
+.detail-cover {
+    width: 100%;
+    display: block;
+    border: 1px solid #808080;
+}
+
+/* Shared metadata / info table */
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.info-table th,
+.info-table td {
+    text-align: left;
+    padding: 3px 6px;
+    border-bottom: 1px solid #d4d0c8;
+}
+
+.info-table th {
+    width: 180px;
+    color: #444;
+    font-weight: normal;
+}
+
+/* Track listing table */
+.track-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.track-table th,
+.track-table td {
+    text-align: left;
+    padding: 3px 8px;
+    border-bottom: 1px solid #d4d0c8;
+}
+
+.track-table thead th {
+    background-color: #d4d0c8;
+    font-weight: bold;
+}
+
+.track-table tfoot td {
+    border-top: 2px solid #808080;
+    border-bottom: none;
+}
+
+.track-row-alt {
+    background-color: #ece9d8;
+}
+
+.track-num {
+    text-align: center;
+    width: 28px;
+    color: #444;
+}
+
+.track-dur {
+    font-family: monospace;
+    white-space: nowrap;
+}
+
+/* ---------- Collection detail page ---------- */
+
+.collection-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.collection-table th,
+.collection-table td {
+    text-align: left;
+    padding: 3px 8px;
+    border-bottom: 1px solid #d4d0c8;
+}
+
+.collection-table thead th {
+    background-color: #d4d0c8;
+    font-weight: bold;
+}
+
+.collection-table a {
+    color: #000080;
+}

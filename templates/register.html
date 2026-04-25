@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Register — Music Library{% endblock %}
+{% block window_title %}Register{% endblock %}
+{% block status_left %}Create a new account{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="window auth-dialog">
+        <div class="title-bar">
+            <div class="title-bar-text">New User Registration</div>
+            <div class="title-bar-controls">
+                <button aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="window-body">
+            <form method="post" action="{{ url_for('register') }}">
+                <fieldset>
+                    <legend>Account details</legend>
+                    <div class="field-row-stacked">
+                        <label for="username">Username</label>
+                        <input id="username" name="username" type="text"
+                               required autofocus>
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="email">Email</label>
+                        <input id="email" name="email" type="email" required>
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="password">Password</label>
+                        <input id="password" name="password" type="password"
+                               required>
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="confirm">Confirm password</label>
+                        <input id="confirm" name="confirm" type="password"
+                               required>
+                    </div>
+                </fieldset>
+                <section class="auth-actions">
+                    <button type="submit">Create account</button>
+                    <a href="{{ url_for('home') }}"><button type="button">Cancel</button></a>
+                </section>
+            </form>
+            <p class="auth-footer">
+                Already have an account?
+                <a href="{{ url_for('login') }}">Login here</a>.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

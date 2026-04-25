@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Music Library{% endblock %}</title>
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body>
+    <div class="desktop">
+        <div class="window app-window">
+            <div class="title-bar">
+                <div class="title-bar-text">
+                    Music Library — {% block window_title %}Home{% endblock %}
+                </div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize"></button>
+                    <button aria-label="Maximize"></button>
+                    <button aria-label="Close"></button>
+                </div>
+            </div>
+
+            <div class="menu-bar">
+                <a href="{{ url_for('home') }}" class="menu-item">File</a>
+                <a href="{{ url_for('home') }}" class="menu-item">Home</a>
+                <a href="#" class="menu-item">Browse</a>
+                <a href="#" class="menu-item">Help</a>
+                <span class="menu-spacer"></span>
+                {% if current_user %}
+                    <span class="menu-item user-chip">User: {{ current_user }}</span>
+                    <form action="{{ url_for('logout') }}" method="post" class="menu-form">
+                        <button type="submit">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="menu-item">Login</a>
+                    <a href="{{ url_for('register') }}" class="menu-item">Register</a>
+                {% endif %}
+            </div>
+
+            <div class="window-body app-window-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <fieldset class="flash-area">
+                            <legend>Messages</legend>
+                            {% for category, msg in messages %}
+                                <p class="flash flash-{{ category }}">{{ msg }}</p>
+                            {% endfor %}
+                        </fieldset>
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </div>
+
+            <div class="status-bar">
+                <p class="status-bar-field">{% block status_left %}Ready{% endblock %}</p>
+                <p class="status-bar-field">
+                    {% if current_user %}
+                        Signed in as {{ current_user }}
+                    {% else %}
+                        Not signed in
+                    {% endif %}
+                </p>
+                <p class="status-bar-field">CSE 412 — Phase 3</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
