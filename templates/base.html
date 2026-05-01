@@ -24,8 +24,8 @@
             <div class="menu-bar">
                 <a href="{{ url_for('home') }}" class="menu-item">File</a>
                 <a href="{{ url_for('home') }}" class="menu-item">Home</a>
-                <a href="#" class="menu-item">Browse</a>
-                <a href="#" class="menu-item">Help</a>
+                <a href="{{ url_for('browse') }}" class="menu-item">Browse</a>
+                <a href="{{ url_for('help') }}" class="menu-item">Help</a>
                 <span class="menu-spacer"></span>
                 {% if current_user %}
                     <span class="menu-item user-chip">User: {{ current_user }}</span>
