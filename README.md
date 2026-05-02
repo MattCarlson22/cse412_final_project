@@ -46,7 +46,7 @@ You can also register a new account from the UI (stored in memory only, resets o
 - [ ] Address grader feedback from Phase 2
 
 ### Backend / database
-- [ ] Replace mock data with a real PostgreSQL connection (`psycopg2`)
+- [x] Replace mock data with a real PostgreSQL connection (`psycopg2`)
 - [ ] Add `DATABASE_URL` (or host/port/dbname/user/password) env vars to setup instructions
 - [ ] Wire login/register to the `Users` table (parameterized queries, no plaintext passwords)
 - [ ] Wire home, release detail, and collection detail pages to live DB queries

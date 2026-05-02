@@ -4,7 +4,7 @@ Frontend-only scaffolding. Mock data lives in `mock_data.py`. Auth is a
 session cookie backed by a hardcoded user list — wire to PostgreSQL later.
 """
 
-import os
+import os, psycopg2
 
 from flask import (
     Flask,
