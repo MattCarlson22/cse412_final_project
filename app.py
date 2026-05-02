@@ -17,6 +17,7 @@ from flask import (
 )
 
 import mock_data
+import postgres.db_connection as db # database initialization script
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-only-do-not-use-in-prod")
