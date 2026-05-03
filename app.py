@@ -133,6 +133,7 @@ def logout():
 
 
 def get_collections(cid=-1):
+    """takes an optional input of a collection id, and returns either that collection id or all collections."""
     if cid == -1:
         return _get_all_collections()
     else:
@@ -140,10 +141,12 @@ def get_collections(cid=-1):
 
 
 def get_collections_by_id():
+    """Returns a dictionary with key pair relationship (collection_id, collection)"""
     return {c["c_id"]: c for c in get_collections()}
 
 
 def get_collection_rids(cid=0):
+    """Returns a list of dictionaries of all collection data"""
     titles = []
     rids = []
     for t in db.query(
@@ -163,6 +166,7 @@ def get_collection_rids(cid=0):
 
 
 def _get_all_collections():
+    """Returns list containing of dictionaries for all collections."""
     collections = []
     c_tbl = db.select(tbls="collection")
 
@@ -177,6 +181,7 @@ def _get_all_collections():
 
 
 def _get_collection_cid(cid):
+    """Returns a list containing the desired collection"""
     collections = []
     c_tbl = db.select(tbls="collection")
 
@@ -218,6 +223,7 @@ def get_releases():
 
 
 def get_releases_by_id():
+    """Returns a dictionary with a key pair of (release_id, release)""" 
     return {r["id"]: r for r in get_releases()}
 
 
@@ -255,6 +261,7 @@ def get_tracks(album):
 
 
 def get_users():
+    """Returns list of dictionaries containing all user information"""
     u_tbl = db.select(tbls="users")
     user_list = []
 
@@ -269,9 +276,36 @@ def get_users():
     return user_list
 
 
+def get_user_collections(uid="-1", username="none"):
+    """Returns all collections belonging to user with inputted uid or username"""
+
+    col_list = []
+    if uid == -1 and username == "none":
+        return
+    elif username == "none": # search by u_id
+        collection_ids = db.select(rows="c_id", tbls="collection", pred=f"u_id = {uid}")
+
+        for id in collection_ids:
+            col = get_collections(id[0])[0]     # id is a tuple w/ 1 elem; get_collections returns a list of dictionaries.
+            col_list.append(col)
+    else: # search by username
+        collection_ids = db.query(
+            f"""
+            SELECT c_id
+            FROM collection JOIN users ON collection.u_id = users.u_id
+            WHERE username = '{username}'
+            """)
+
+        for id in collection_ids:
+            col = get_collections(id[0])[0]
+            col_list.append(col)
+    
+    return col_list
+
+
 if __name__ == "__main__":
     # macOS reserves port 5000 for AirPlay Receiver, so default to 5001.
     db.init_db()
-    
+
     port = int(os.environ.get("FLASK_PORT", 5001))
     app.run(debug=True, port=port)
