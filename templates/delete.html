@@ -1,0 +1,50 @@
+{% extends "base.html" %} {% block title %}Delete — Music Library{% endblock %}
+{% block window_title %}Delete{% endblock %} {% block status_left %}Confirm
+deletion{% endblock %} {% block content %}
+<div class="auth-wrapper">
+  <div class="window auth-dialog">
+    <div class="title-bar">
+      <div class="title-bar-text">Delete</div>
+      <div class="title-bar-controls">
+        <button aria-label="Close"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <form method="post" action="">
+        <fieldset>
+          <legend>Delete this release?</legend>
+          <p>Are you sure you want to delete this release?</p>
+          <table class="info-table">
+            <tr>
+              <th>Title</th>
+              <td>{{ release.title }}</td>
+            </tr>
+            <tr>
+              <th>Artist</th>
+              <td>{{ release.contributors }}</td>
+            </tr>
+            <tr>
+              <th>Released</th>
+              <td>{{ release.r_date }}</td>
+            </tr>
+            <tr>
+              <th>Tracks</th>
+              <td>{{ release.tracks|length }}</td>
+            </tr>
+          </table>
+          <p>
+            This will also remove all tracks on this release. This cannot be
+            undone.
+          </p>
+        </fieldset>
+        <section class="auth-actions">
+          <button type="submit" style="background: #c33; color: white; font-weight: bold;">Delete</button>
+          <a href="{{ url_for('release_detail', release_id=release.id) }}"
+            ><button type="button">Cancel</button></a
+          >
+        </section>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

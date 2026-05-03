@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Add a Release — Music Library{% endblock %}
+{% block window_title %}New Release{% endblock %}
+{% block status_left %}Add a new Release to your library{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="window auth-dialog">
+        <div class="title-bar">
+            <div class="title-bar-text">New Release Info</div>
+            <div class="title-bar-controls">
+                <button aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="window-body">
+            <form method="post" action="">
+                <fieldset>
+                    <legend>Release details</legend>
+                    <div class="field-row-stacked">
+                        <label for="title">Title</label>
+                        <input id="title" name="title" type="text"
+                               required autofocus>
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="contributors">Artist/Contributors</label>
+                        <input id="contributors" name="contributors" type="text" required>
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="r_type">Type</label>
+                        <select id="r_type" name="r_type" required>
+                            <option value="Album">Album</option>
+                            <option value="EP">EP</option>
+                            <option value="Single">Single</option>
+                            <option value="Compilation">Compilation</option>
+                        </select>
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="format">Format</label>
+                        <select id="format" name="format" required>
+                            <option value="Digital">Digital</option>
+                            <option value="CD">CD</option>
+                            <option value="Vinyl">Vinyl</option>
+                            <option value="Cassette">Cassette</option>
+                        </select>
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="r_date">Release Date</label>
+                        <input id="r_date" name="r_date" type="date" required>
+                    </div>
+                <div class="field-row-stacked">
+                        <label for="r_label">Label</label>
+                        <input id="r_label" name="r_label" type="text" required>
+                    </div>
+                <div class="field-row-stacked">
+                        <label for="cover">Cover URL</label>
+                        <input id="cover" name="cover" type="url">
+                    </div>
+                <div class="field-row-stacked">
+                        <label for="details">Details</label>
+                        <textarea id="details" name="details" rows="3" maxlength="200"></textarea>
+                    </div>
+                </fieldset>
+                <section class="auth-actions">
+                    <button type="submit">Add Record</button>
+                    <a href="{{ url_for('home') }}"><button type="button">Cancel</button></a>
+                </section>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
