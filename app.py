@@ -115,6 +115,16 @@ def collection_detail(c_id):
                            releases=releases, stats=stats)
 
 
+@app.route("/browse")
+def browse():
+    return render_template("browse.html", releases=get_releases())
+
+
+@app.route("/help")
+def help():
+    return render_template("help.html")
+
+
 @app.route("/logout", methods=["POST"])
 def logout():
     session.clear()

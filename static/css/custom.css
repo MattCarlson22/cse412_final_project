@@ -255,6 +255,7 @@ body {
     width: 100%;
     border-collapse: collapse;
     font-size: 12px;
+    table-layout: fixed;
 }
 
 .track-table th,
@@ -287,6 +288,7 @@ body {
 .track-dur {
     font-family: monospace;
     white-space: nowrap;
+    width: 70px;
 }
 
 /* ---------- Collection detail page ---------- */

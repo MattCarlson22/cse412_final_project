@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Help{% endblock %}
+{% block window_title %}Help{% endblock %}
+{% block content %}
+<fieldset>
+    <legend>Help Center</legend>
+    <h3>Welcome to Music Library</h3>
+    <p>
+        Music Library lets users browse releases, view album details, and organize music
+        into collections. This version uses mock data for the frontend, but the layout is
+        designed to connect to the database later.
+    </p>
+    <fieldset>
+        <legend>Browsing Releases</legend>
+        <p>
+            Use the Browse page to view all available music releases. Each release card
+            shows the title, artist, genre, format, label, and release date. Click
+            <strong>View</strong> to open the full release page.
+        </p>
+    </fieldset>
+    <fieldset>
+        <legend>Release Details</legend>
+        <p>
+            The release detail page shows more information about a selected release,
+            including its description, metadata, and track listing.
+        </p>
+    </fieldset>
+    <fieldset>
+        <legend>Collections</legend>
+        <p>
+            Collections group releases together, such as favorite albums, road trip music,
+            or vinyl records. Collection pages show the releases included and basic stats
+            like total tracks, formats, and genres.
+        </p>
+    </fieldset>
+    <fieldset>
+        <legend>Account Features</legend>
+        <p>
+            Users can register, log in, and log out. Account information is connected
+            to PostgreSQL.
+        </p>
+    </fieldset>
+    <fieldset>
+        <legend>Need Help?</legend>
+        <p>
+            If something does not load, try returning to the Home page or logging in again.
+        </p>
+    </fieldset>
+</fieldset>
+{% endblock %}
+{% block status_left %}Viewing help{% endblock %}
