@@ -18,17 +18,27 @@
     <legend>Browse Releases</legend>
     <div class="release-grid">
         {% for release in releases %}
-        <div class="release-card">
-            <img src="{{ release.cover }}" alt="{{ release.title }} cover" class="release-cover">
-            <div class="release-info">
-                <h3>{{ release.title }}</h3>
-                <p><strong>Artist:</strong> {{ release.contributors }}</p>
-                <p><strong>Genre:</strong> {{ release.genre }}</p>
-                <p><strong>Format:</strong> {{ release.format }}</p>
-                <p><strong>Released:</strong> {{ release.r_date }}</p>
-                <a href="{{ url_for('release_detail', release_id=release.id) }}">
-                    <button type="button">View Release</button>
-                </a>
+        <div class="window release-card">
+            <div class="title-bar">
+                <div class="title-bar-text">{{ release.title }}</div>
+            </div>
+            <div class="window-body release-card-body">
+                <img src="{{ release.cover }}" alt="{{ release.title }} cover"
+                     class="release-cover"
+                     onerror="this.style.display='none'">
+                <p class="release-artist">{{ release.contributors }}</p>
+                <p class="release-meta">
+                    {{ release.r_date[:4] }} &middot; {{ release.format }} &middot; {{ release.genre }}
+                </p>
+                <p class="release-label">{{ release.r_label }}</p>
+                <div class="release-actions">
+                    <a href="{{ url_for('release_detail', release_id=release.id) }}">
+                        <button>Details</button>
+                    </a>
+                    {% if current_user %}
+                        <button>Add to Collection</button>
+                    {% endif %}
+                </div>
             </div>
         </div>
         {% endfor %}
