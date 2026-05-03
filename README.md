@@ -11,10 +11,20 @@ Flask frontend for the CSE 412 music library project (Phase 3). Currently uses m
 python3 -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 
-# 2. Install dependencies
+# 2. Set env variables
+Create a .env file with the following values (change as needed):
+```
+DB_HOST="localhost"
+DB_NAME="musicdb"
+DB_USERNAME="postgres"
+DB_PASSWORD="password"
+DB_PORT="5432"
+```
+
+# 3. Install dependencies
 pip install -r requirements.txt
 
-# 3. Run the development server
+# 4. Run the development server
 python app.py
 ```
 
