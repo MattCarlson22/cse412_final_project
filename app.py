@@ -117,5 +117,6 @@ def logout():
 
 if __name__ == "__main__":
     # macOS reserves port 5000 for AirPlay Receiver, so default to 5001.
+    db.init_db()
     port = int(os.environ.get("FLASK_PORT", 5001))
     app.run(debug=True, port=port)
