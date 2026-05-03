@@ -5,7 +5,10 @@ psycopg2 cursor results later is a near-drop-in change.
 """
 
 USERS = [
-    {"username": "jdoe", "password": "pass123", "email": "jdoe@email.com"},
+    {
+        "username": "jdoe", 
+        "password": "pass123", 
+        "email": "jdoe@email.com"},
     {"username": "asmith", "password": "music4life", "email": "asmith@gmail.com"},
     {"username": "mjohnson", "password": "vinyl99", "email": "mj@yahoo.com"},
     {"username": "kwilliams", "password": "beats2024", "email": "kwill@email.com"},
@@ -28,7 +31,13 @@ RELEASES = [
                    "features a celebrated medley of songs that flow seamlessly into "
                    "one another.",
         "tracks": [
-            {"t_num": 1, "title": "Come Together", "duration": 259, "genre": "Rock", "features": ""},
+            {
+                "t_num": 1, 
+                "title": "Come Together", 
+                "duration": 259, 
+                "genre": "Rock", 
+                "features": ""
+            },
             {"t_num": 2, "title": "Something",     "duration": 182, "genre": "Rock", "features": ""},
             {"t_num": 3, "title": "Here Comes the Sun", "duration": 185, "genre": "Rock", "features": ""},
             {"t_num": 4, "title": "Oh! Darling",   "duration": 208, "genre": "Rock", "features": ""},

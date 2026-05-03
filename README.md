@@ -2,6 +2,15 @@
 
 Flask frontend for the CSE 412 music library project (Phase 3). Currently uses mock data; PostgreSQL integration is planned for a later phase.
 
+## A couple Important notes:
+- not entirely sure that I did the paramaterized queries / no plaintext passwords properly, someone double check that please
+- A couple things were off about the collection page
+  1. Our DB Schema doesn't have collection names. For now they're a filler.
+  2. I couldn't figure out how to get the current user that's logged in, so right now it displays all collections
+- For some reason if you register an account, log out, then try to log back in, you can't. Don't know why.
+- If you try to register a bunch of accounts, something with the _cur variable breaks. idk if it's psycopg2 or my code.
+- I had to remove the email format check from init.sql, because it wasn't playing nice with making new accounts. The app still does the format checking though.
+- I think that's it but I've been working almost nonstop for like 8 hours im tired.
 ## Setup
 
 **Prerequisites:** Python 3.9+
@@ -58,8 +67,8 @@ You can also register a new account from the UI (stored in memory only, resets o
 ### Backend / database
 - [x] Replace mock data with a real PostgreSQL connection (`psycopg2`)
 - [x] Add `DATABASE_URL` (or host/port/dbname/user/password) env vars to setup instructions
-- [ ] Wire login/register to the `Users` table (parameterized queries, no plaintext passwords)
-- [ ] Wire home, release detail, and collection detail pages to live DB queries
+- [x]? Wire login/register to the `Users` table (parameterized queries, no plaintext passwords)
+- [x] Wire home, release detail, and collection detail pages to live DB queries
 
 ### CRUD operations (20 pts — all four required)
 - [ ] **Create** — add UI + route to insert a new release (or other record) into the DB
