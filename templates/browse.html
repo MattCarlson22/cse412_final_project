@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Browse Releases{% endblock %}
+{% block window_title %}Browse{% endblock %}
+{% block content %}
+<fieldset>
+    <section class="search-panel">
+        <fieldset>
+            <legend>Search</legend>
+            <form onsubmit="event.preventDefault(); alert('Search is not wired up yet.');">
+                <div class="field-row">
+                    <label for="q">Find a release:</label>
+                    <input id="q" type="text" placeholder="Title, artist, label...">
+                    <button type="submit">Go</button>
+                </div>
+            </form>
+        </fieldset>
+    </section>
+    <legend>Browse Releases</legend>
+    <div class="release-grid">
+        {% for release in releases %}
+        <div class="release-card">
+            <img src="{{ release.cover }}" alt="{{ release.title }} cover" class="release-cover">
+            <div class="release-info">
+                <h3>{{ release.title }}</h3>
+                <p><strong>Artist:</strong> {{ release.contributors }}</p>
+                <p><strong>Genre:</strong> {{ release.genre }}</p>
+                <p><strong>Format:</strong> {{ release.format }}</p>
+                <p><strong>Released:</strong> {{ release.r_date }}</p>
+                <a href="{{ url_for('release_detail', release_id=release.id) }}">
+                    <button type="button">View Release</button>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</fieldset>
+{% endblock %}
+{% block status_left %}Browsing releases{% endblock %}
