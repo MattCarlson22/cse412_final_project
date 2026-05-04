@@ -2,15 +2,6 @@
 
 Flask frontend for the CSE 412 music library project (Phase 3). Currently uses mock data; PostgreSQL integration is planned for a later phase.
 
-## A couple Important notes:
-- not entirely sure that I did the paramaterized queries / no plaintext passwords properly, someone double check that please
-- A couple things were off about the collection page
-  1. Our DB Schema doesn't have collection names. For now they're a filler.
-  2. I couldn't figure out how to get the current user that's logged in, so right now it displays all collections
-- For some reason if you register an account, log out, then try to log back in, you can't. Don't know why.
-- If you try to register a bunch of accounts, something with the _cur variable breaks. idk if it's psycopg2 or my code.
-- I had to remove the email format check from init.sql, because it wasn't playing nice with making new accounts. The app still does the format checking though.
-- I think that's it but I've been working almost nonstop for like 8 hours im tired.
 ## Setup
 
 **Prerequisites:** Python 3.9+
@@ -22,13 +13,11 @@ source venv/bin/activate        # Windows: venv\Scripts\activate
 
 # 2. Set env variables
 Create a .env file with the following values (change as needed):
-```
 DB_HOST="localhost"
 DB_NAME="musicdb"
 DB_USERNAME="postgres"
 DB_PASSWORD="password"
 DB_PORT="5432"
-```
 
 # 3. Install dependencies
 pip install -r requirements.txt
