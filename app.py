@@ -32,8 +32,8 @@ def inject_user():
 def home():
     return render_template(
         "home.html",
-        releases=get_releases(),
-        collections=get_collections(),
+        releases=get_releases()[:20],
+        collections=get_collections()[:5],
     )
 
 
@@ -113,9 +113,9 @@ def collection_detail(c_id):
     }
     return render_template("collection.html", collection=collection,
                            releases=releases, stats=stats)
-@app.route("/browse")
-def browse():
-    return render_template("browse.html", releases=mock_data.RELEASES)
+# @app.route("/browse")
+# def browse():
+#     return render_template("browse.html", releases=mock_data.RELEASES)
 
 @app.route("/help")
 def help():
@@ -183,6 +183,7 @@ def delete(release_id):
             flash(f"Release '{title}' was deleted.", "success")
             return redirect(url_for("home"))
         except Exception as e:
+            db._conn.rollback()
             print(f"DELETE ERROR: {e}")
             flash(f"Error deleting release", "error")
             return redirect(url_for("home"))
@@ -225,10 +226,129 @@ def edit(release_id):
             flash(f"Release '{title}' was updated.", "success")
             return redirect(url_for("home"))
         except Exception as e:
+            db._conn.rollback()
             print(f"UPDATE ERROR: {e}")
             flash("Error updating release", "error")
             return redirect(url_for("home"))
     return render_template("edit.html", release = release)
+
+@app.route("/release/<int:release_id>/track/add", methods=["GET", "POST"])
+def add_track(release_id):
+    release = get_releases_by_id().get(release_id)
+    if release is None:
+        flash("Release was not found", "error")
+        return redirect(url_for("home"))
+    
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        t_num = request.form.get("t_num", "")
+        duration = request.form.get("duration", "")
+        genre = request.form.get("genre", "").strip()
+        features = request.form.get("features", "").strip()
+        
+        if not title or not t_num or not duration or not genre:
+            flash("All required fields must be filled out", "error")
+            return render_template("add_track.html", release=release)
+        
+        r_title = release["title"]
+        r_contributors = release["contributors"]
+
+        good_insert = db.insert(
+            "track",
+            f"'{title}', '{r_title}', '{r_contributors}', {t_num}, {duration}, '{genre}', '{features}'"
+        )
+        
+        if good_insert:
+            flash(f"Track '{title}' added to {r_title}!", "success")
+            return redirect(url_for("release_detail", release_id=release_id))
+        else:
+            flash("Error adding track", "error")
+            return render_template("add_track.html", release=release)
+    return render_template("add_track.html", release=release)
+
+@app.route("/release/<int:release_id>/track/<t_track>/delete", methods=["GET", "POST"])
+def delete_track(release_id, t_track):
+    release = get_releases_by_id().get(release_id)
+    if release is None:
+        flash("Release was not found.", "error")
+        return redirect(url_for("home"))
+    
+    #find a specific track
+    track = None
+    for t in release["tracks"]:
+        if t["title"] == t_track:
+            track = t
+            break
+        
+    if track is None:
+        flash("Track not found.", "error")
+        return redirect(url_for("release_detail", release_id=release_id))
+
+    if request.method == "POST":
+        r_title = release["title"]
+        r_contributors = release["contributors"]
+        try:
+            db._cur.execute(
+                f"DELETE FROM track WHERE title = '{t_track}' AND r_title = '{r_title}' AND r_contributors= '{r_contributors}'"
+            )
+            db._conn.commit()
+            flash(f"Track '{t_track}' was deleted.", "success")
+            return redirect(url_for("release_detail", release_id=release_id))
+        except Exception as e:
+            db._conn.rollback()
+            print(f"Delete track ERROR: {e}")
+            flash("Error deleting the track", "error")
+            return redirect(url_for("release_detail", release_id=release_id))
+    return render_template("delete_track.html", release=release, track=track)
+
+@app.route("/release/<int:release_id>/track/<t_track>/edit", methods=["GET", "POST"]) 
+def edit_track(release_id, t_track):
+    release = get_releases_by_id().get(release_id)
+    if release is None:
+        flash("Release was not found.", "error")
+        return redirect(url_for("home")) 
+    
+    #find a specific track
+    track = None
+    for t in release["tracks"]:
+        if t["title"] == t_track:
+            track = t
+            break        
+    
+    if track is None:
+        flash("Track not found.", "error")
+        return redirect(url_for("release_detail", release_id=release_id))
+    
+    if request.method == "POST":
+        org_title = track["title"]
+        r_title = release["title"]
+        r_contributors = release["contributors"]
+        
+        title = request.form.get("title", "").strip()
+        t_num = request.form.get("t_num", "")
+        duration = request.form.get("duration", "")
+        genre = request.form.get("genre", "").strip()
+        features = request.form.get("features", "").strip()
+        
+        if not title or not t_num or not duration or not genre:
+            flash("All required fields must be filled out", "error")
+            return render_template("edit_track.html", release=release, track=track)
+
+        try:
+            db._cur.execute(
+                f"UPDATE track SET title = '{title}', t_num = {t_num}, duration = {duration}, genre= '{genre}', features = '{features}' "
+                f"WHERE title = '{org_title}' AND r_title = '{r_title}' AND r_contributors = '{r_contributors}'"
+            )
+            db._conn.commit()
+            flash(f"Track '{title}' was updated", "success")
+            return redirect(url_for("release_detail", release_id=release_id))
+        except Exception as e:
+            db._conn.rollback()
+            print(f"Update track ERROR: {e}")
+            flash("Error updating the track", "error")
+            return redirect(url_for("release_detail", release_id=release_id))
+    return render_template("edit_track.html", release=release, track=track)
+
 
 def get_collections(cid=-1):
     """takes an optional input of a collection id, and returns either that collection id or all collections."""

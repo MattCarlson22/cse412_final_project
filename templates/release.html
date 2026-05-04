@@ -29,6 +29,7 @@
             <div class="window-body">
                 <p><button style="width:100%">Add to Collection</button></p>
                 <p><button style="width:100%">Mark as Owned</button></p>
+                <p><a href="{{ url_for('add_track', release_id=release.id) }}"><button style="width:100%">+ Add Track</button></a></p>
                 <p><a href="{{ url_for('edit', release_id=release.id) }}"><button style="width:100%">Edit</button></a></p>
                 <p><a href="{{ url_for('delete', release_id=release.id) }}"><button style="width:100%; background: #c33; color: white;">Delete</button></a></p>
             </div>
@@ -77,6 +78,16 @@
                         </td>
                         <td>{{ t.genre }}</td>
                         <td>{{ t.features if t.features else '—' }}</td>
+                        <td>
+                            {% if current_user %}
+                            <a href="{{ url_for('edit_track', release_id=release.id, t_track=t.title) }}">
+                                <button>Edit</button>
+                            </a>
+                            <a href="{{ url_for('delete_track', release_id=release.id, t_track=t.title) }}">
+                                <button>Delete</button>
+                            </a>
+                             {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

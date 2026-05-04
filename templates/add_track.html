@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Add a track — Music Library{% endblock %}
+{% block window_title %}New Track{% endblock %}
+{% block status_left %}Add a new track to {{ release.title }}{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="window auth-dialog">
+        <div class="title-bar">
+            <div class="title-bar-text">Add track to {{ release.title }}</div>
+            <div class="title-bar-controls">
+                <button aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="window-body">
+            <form method="post" action="">
+                <fieldset>
+                    <legend>Track details</legend>
+                    <div class="field-row-stacked">
+                        <label for="title">Track title</label>
+                        <input id="title" name="title" type="text"
+                               required autofocus>
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="t_num">Track number</label>
+                        <input id="t_num" name="t_num" type="number" min="1" required>
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="duration">Duration (seconds)</label>
+                        <input id="duration" name="duration" type="number" min="1" required>
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="genre">Genre</label>
+                        <input id="genre" name="genre" type="text" required>
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="features">Features (optional)</label>
+                        <input id="features" name="features" type="text">
+                    </div>
+                </fieldset>
+                <section class="auth-actions">
+                    <button type="submit">Add Track</button>
+                    <a href="{{ url_for('release_detail', release_id=release.id) }}"><button type="button">Cancel</button></a>
+                </section>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
