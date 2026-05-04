@@ -21,7 +21,7 @@
 <section class="search-panel">
     <fieldset>
         <legend>Search</legend>
-        <form onsubmit="event.preventDefault(); alert('Search is not wired up yet.');">
+        <form id="search-form" onsubmit="return false;">
             <div class="field-row">
                 <label for="q">Find a release:</label>
                 <input id="q" type="text" placeholder="Title, artist, label...">
@@ -85,7 +85,8 @@
         {% endif %}
         <div class="release-grid">
             {% for r in releases %}
-                <div class="window release-card">
+                <div class="window release-card"
+                     data-search="{{ (r.title ~ ' ' ~ r.contributors ~ ' ' ~ r.r_label ~ ' ' ~ r.genre) | lower }}">
                     <div class="title-bar">
                         <div class="title-bar-text">{{ r.title }}</div>
                     </div>
@@ -129,4 +130,17 @@
         </div>
     </fieldset>
 </section>
+<script>
+(function () {
+    var input = document.getElementById('q');
+    function filter() {
+        var q = input.value.trim().toLowerCase();
+        document.querySelectorAll('.release-card').forEach(function (card) {
+            card.style.display = (!q || card.dataset.search.includes(q)) ? '' : 'none';
+        });
+    }
+    input.addEventListener('input', filter);
+    document.getElementById('search-form').addEventListener('submit', filter);
+})();
+</script>
 {% endblock %}
