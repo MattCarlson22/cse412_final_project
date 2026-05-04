@@ -29,6 +29,8 @@
             <div class="window-body">
                 <p><button style="width:100%">Add to Collection</button></p>
                 <p><button style="width:100%">Mark as Owned</button></p>
+                <p><a href="{{ url_for('edit', release_id=release.id) }}"><button style="width:100%">Edit</button></a></p>
+                <p><a href="{{ url_for('delete', release_id=release.id) }}"><button style="width:100%; background: #c33; color: white;">Delete</button></a></p>
             </div>
         </div>
         {% endif %}

@@ -41,6 +41,177 @@ def get_col_names(tbl) -> list:
     return cols
 
 
+def get_collections(cid=-1):
+    """takes an optional input of a collection id, and returns either that collection id or all collections."""
+    if cid == -1:
+        return _get_all_collections()
+    else:
+        return _get_collection_cid(cid)
+
+
+def get_collections_by_id():
+    """Returns a dictionary with key pair relationship (collection_id, collection)"""
+    return {c["c_id"]: c for c in get_collections()}
+
+
+def get_collection_rids(cid=0):
+    """Returns a list of dictionaries of all collection data"""
+    titles = []
+    rids = []
+    for t in query(
+        f"""
+        SELECT distinct title
+        FROM has JOIN creates ON has.g_id = creates.g_id
+        WHERE c_id = {cid}
+        """
+    ): 
+        titles.append(t[0])
+
+    rids = []
+    for r in get_releases():
+        if r["title"] in titles:
+            rids.append(r["id"])
+    return rids
+
+
+def _get_all_collections():
+    """Returns list containing of dictionaries for all collections."""
+    collections = []
+    c_tbl = select(tbls="collection")
+
+    for c in c_tbl:
+        cdict = {
+            "c_id":         c[0],
+            "name":         f"Collection # {c[0]}",
+            "release_ids":  get_collection_rids(c[0])
+        }
+        collections.append(cdict)
+    return collections
+
+
+def _get_collection_cid(cid):
+    """Returns a list containing the desired collection"""
+    collections = []
+    c_tbl = select(tbls="collection")
+
+    for c in c_tbl:
+        if cid == c[0]:
+            cdict = {
+                "c_id":         c[0],
+                "name":         f"Collection # {c[0]}",
+                "release_ids":  get_collection_rids(c[0])
+            }
+            collections.append(cdict)
+    return collections
+
+
+def get_releases():
+    """Returns a dictionary with all releases in the DB"""
+    r_tbl = select(tbls="releases") # list of tuples, tuple elems are varying types
+    releases = [] # a list of dictionaries
+
+    rid = 1
+    for r in r_tbl:
+        tracks, genres = get_tracks(r[0])
+        rdict = {
+            "id":           rid,
+            "title":        r[0],
+            "contributors": r[1],
+            "r_type":       r[2],
+            "format":       r[3],
+            "r_date":       str( r[4] ),
+            "r_label":      r[5],
+            "cover":        r[6],
+            "genre":        genres,
+            "details":      r[7],
+            "tracks":       tracks,
+        }
+        releases.append(rdict)
+        rid += 1
+    return releases
+
+
+def get_releases_by_id():
+    """Returns a dictionary with a key pair of (release_id, release)""" 
+    return {r["id"]: r for r in get_releases()}
+
+
+def get_tracks(album):
+    """ Searches the database for tracks off the given album. 
+        Returns a dictionary containing those tracks, and a list of genres."""
+
+    tracks = [] # list of dictionaries
+    t_tbl = select(tbls="track", pred=f"r_title = '{album}'")
+    genres_list = []
+
+    for t in t_tbl:
+        if t[5] not in genres_list:
+            genres_list.append(t[5])
+
+        tdict = {
+            "t_num":    int( t[3] ),
+            "title":    t[0],
+            "duration": int( t[4] ),
+            "genre":    t[5],
+            "features": t[6],
+        }
+        tracks.append(tdict)
+    
+    # format genres list
+    genres = ""
+    genres_list.sort()
+    for g in genres_list:
+        if(genres_list[-1] == g):
+            genres += g
+        else:
+            genres += f"{g}, "
+    
+    return tracks, genres
+
+
+def get_users():
+    """Returns list of dictionaries containing all user information"""
+    u_tbl = select(tbls="users")
+    user_list = []
+
+    for u in u_tbl:
+        udict = {
+            "username": u[1],
+            "password":      u[0],
+            "email":    u[2],
+        }
+        user_list.append(udict)
+
+    return user_list
+
+
+def get_user_collections(uid="-1", username="none"):
+    """Returns all collections belonging to user with inputted uid or username"""
+
+    col_list = []
+    if uid == -1 and username == "none":
+        return
+    elif username == "none": # search by u_id
+        collection_ids = select(rows="c_id", tbls="collection", pred=f"u_id = {uid}")
+
+        for id in collection_ids:
+            col = get_collections(id[0])[0]     # id is a tuple w/ 1 elem; get_collections returns a list of dictionaries.
+            col_list.append(col)
+    else: # search by username
+        collection_ids = query(
+            f"""
+            SELECT c_id
+            FROM collection JOIN users ON collection.u_id = users.u_id
+            WHERE username = '{username}'
+            """)
+
+        for id in collection_ids:
+            col = get_collections(id[0])[0]
+            col_list.append(col)
+    
+    return col_list
+
+
 def init_db():
     """Should be called on app startup to initialize & connect the database."""
 
@@ -58,7 +229,10 @@ def init_db():
             #print(f"{tbl}: ({cols})") # FIXME: tester line
 
             _cur.copy_from(f, tbl, sep=",", columns=cols)
-            _conn.commit()
+            try:
+                _conn.commit()
+            except:
+                _conn.rollback()
 
 
 def insert(tbl="releases", vals = ""):
@@ -126,35 +300,3 @@ def _drop_tables():
 
     for tbl in _tables:
         _cur.execute(f"DROP TABLE IF EXISTS {tbl.lower()} CASCADE")
-
-
-if __name__ == "__main__":
-    init_db()
-
-    #print("\nTESTING SELECT")
-    #qres = select("c_id", "collection", "c_id % 2 = 0")
-    #print(f"qres type: {type(qres)}")
-    #for s in qres:
-    #    print(s[0])
-
-    
-    #print("\nTESTING INSERT")
-    #qres = insert("users", "'password','username','email@mail.com',69")
-
-    #print("\nTESTING query")
-    #print(qres)
-    #qres = query("""
-    #    SELECT *
-    #    FROM users
-    #    ORDER BY u_id DESC
-    #    LIMIT 1;
-    #""")
-    #print(qres)
-
-    print(get_col_names("collection"))
-    print(get_col_names("creates"))
-    print(get_col_names("has"))
-    print(select())
-
-    _conn.close()
-    _cur.close()

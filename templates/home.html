@@ -66,6 +66,11 @@
 <section class="releases-panel">
     <fieldset>
         <legend>Browse Releases</legend>
+        {% if current_user %}
+        <div style="margin-bottom: 10px;">
+            <a href="{{ url_for('add') }}"><button>+ Add Release</button></a>
+        </div>
+        {% endif %}
         <div class="release-grid">
             {% for r in releases %}
                 <div class="window release-card">
