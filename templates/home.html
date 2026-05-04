@@ -55,7 +55,19 @@
                 </div>
                 <div class="window-body">
                     <p>Start a new collection.</p>
-                    <button>Create</button>
+                    <button id="new-col-btn" type="button"
+                        onclick="document.getElementById('new-col-form').style.display='block'; this.style.display='none'">
+                        Create
+                    </button>
+                    <div id="new-col-form" style="display:none">
+                        <form action="{{ url_for('new_collection') }}" method="post">
+                            <button type="submit">Confirm</button>
+                            <button type="button"
+                                onclick="document.getElementById('new-col-form').style.display='none'; document.getElementById('new-col-btn').style.display=''">
+                                Cancel
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -91,7 +103,24 @@
                                 <button>Details</button>
                             </a>
                             {% if current_user %}
-                                <button>Add to Collection</button>
+                                <button id="atc-btn-{{ r.id }}" type="button"
+                                    onclick="document.getElementById('atc-{{ r.id }}').style.display='block'; this.style.display='none'">
+                                    Add to Collection
+                                </button>
+                                <div id="atc-{{ r.id }}" style="display:none; margin-top:4px">
+                                    <form action="{{ url_for('add_to_collection', release_id=r.id) }}" method="post">
+                                        <select name="c_id" style="width:100%; margin-bottom:4px">
+                                            {% for c in collections %}
+                                            <option value="{{ c.c_id }}">{{ c.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button type="submit">Add</button>
+                                        <button type="button"
+                                            onclick="document.getElementById('atc-{{ r.id }}').style.display='none'; document.getElementById('atc-btn-{{ r.id }}').style.display=''">
+                                            Cancel
+                                        </button>
+                                    </form>
+                                </div>
                             {% endif %}
                         </div>
                     </div>

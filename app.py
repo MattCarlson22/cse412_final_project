@@ -94,7 +94,8 @@ def release_detail(release_id):
     if release is None:
         flash("Release not found.", "error")
         return redirect(url_for("home"))
-    return render_template("release.html", release=release)
+    collections = db.get_user_collections(username=inject_user()["current_user"]) or []
+    return render_template("release.html", release=release, collections=collections)
 
 
 @app.route("/collection/<int:c_id>")
@@ -228,9 +229,58 @@ def edit(release_id):
     return render_template("edit.html", release = release)
 
 
+@app.route("/release/<int:release_id>/add_to_collection", methods=["POST"])
+def add_to_collection(release_id):
+    if not session.get("username"):
+        flash("Please log in to add to a collection.", "error")
+        return redirect(url_for("login"))
+    c_id = request.form.get("c_id", type=int)
+    release = db.get_releases_by_id().get(release_id)
+    if release is None or c_id is None:
+        flash("Invalid request.", "error")
+        return redirect(url_for("home"))
+    success = db.add_release_to_collection(c_id, release["title"], release["contributors"])
+    if success:
+        flash(f"Added \"{release['title']}\" to collection.", "success")
+    else:
+        flash("Could not add — release may already be in that collection or has no group entry.", "error")
+    return redirect(request.referrer or url_for("home"))
+
+
+@app.route("/collection/new", methods=["POST"])
+def new_collection():
+    if not session.get("username"):
+        flash("Please log in.", "error")
+        return redirect(url_for("login"))
+    uid_row = db.query(f"SELECT u_id FROM users WHERE username = '{session['username']}'")
+    if not uid_row:
+        flash("User not found.", "error")
+        return redirect(url_for("home"))
+    success = _new_collection(uid_row[0][0])
+    if success:
+        flash("New collection created!", "success")
+    return redirect(url_for("home"))
+
+
+@app.route("/collection/<int:c_id>/remove/<int:release_id>", methods=["POST"])
+def remove_from_collection(c_id, release_id):
+    if not session.get("username"):
+        flash("Please log in.", "error")
+        return redirect(url_for("login"))
+    release = db.get_releases_by_id().get(release_id)
+    if release is None:
+        flash("Release not found.", "error")
+        return redirect(url_for("collection_detail", c_id=c_id))
+    success = db.remove_release_from_collection(c_id, release["title"], release["contributors"])
+    if success:
+        flash(f"Removed \"{release['title']}\" from collection.", "success")
+    else:
+        flash("Error removing release from collection.", "error")
+    return redirect(url_for("collection_detail", c_id=c_id))
+
+
 def _new_collection(uid):
     new_cid = db.query("SELECT MAX(c_id) FROM collection")[0][0] + 1
-    print(f'cid={new_cid}, uid={uid}')
     try:
         db._cur.execute(f"INSERT INTO collection(c_id, u_id) VALUES ({new_cid}, {uid})")
         db._conn.commit()
