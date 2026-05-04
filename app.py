@@ -16,7 +16,6 @@ from flask import (
     url_for,
 )
 
-#import mock_data
 import postgres.db_connection as db # database initialization script
 
 app = Flask(__name__)
@@ -32,8 +31,8 @@ def inject_user():
 def home():
     return render_template(
         "home.html",
-        releases=get_releases(),
-        collections=get_collections(),
+        releases=db.get_releases(),
+        collections=db.get_user_collections(username=inject_user()["current_user"]),
     )
 
 
@@ -43,7 +42,7 @@ def login():
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
         match = next(
-            (u for u in get_users()
+            (u for u in db.get_users()
              if u["username"] == username and u["password"] == password),
             None,
         )
@@ -67,18 +66,22 @@ def register():
             flash("All fields are required.", "error")
         elif password != confirm:
             flash("Passwords do not match.", "error")
-        elif any(u["username"] == username for u in get_users()):
+        elif any(u["username"] == username for u in db.get_users()):
             flash("Username already taken.", "error")
-        elif any(u["email"] == email for u in get_users()):
+        elif any(u["email"] == email for u in db.get_users()):
             flash("Email already taken.", "error")
         else:
             uid = db.query("""SELECT MAX(u_id) FROM users""")[0][0] + 1
             successful = db.insert("users", f"'{username}', '{email}', '{password}', '{uid}'")
-            #FIXME: make sure this works
             if(successful):
-                session["username"] = username
-                flash(f"Account created. Welcome, {username}!", "success")
-                return redirect(url_for("home"))
+                col_success = _new_collection(uid)
+                if(col_success == True):
+                    session["username"] = username
+                    flash(f"Account created. Welcome, {username}!", "success")
+                    return redirect(url_for("home"))
+                else:
+                    flash("Error in account creation.", "error")
+                    return redirect(url_for("register"))
             else:
                 flash("Error in account creation.", "error")
                 return redirect(url_for("register"))
@@ -87,24 +90,24 @@ def register():
 
 @app.route("/release/<int:release_id>")
 def release_detail(release_id):
-    release = get_releases_by_id().get(release_id)
+    release = db.get_releases_by_id().get(release_id)
     if release is None:
         flash("Release not found.", "error")
         return redirect(url_for("home"))
-    return render_template("release.html", release=release)
+    collections = db.get_user_collections(username=inject_user()["current_user"]) or []
+    return render_template("release.html", release=release, collections=collections)
 
 
 @app.route("/collection/<int:c_id>")
 def collection_detail(c_id):
-    collection = get_collections_by_id().get(c_id)
+    collection = db.get_collections_by_id().get(c_id)
     if collection is None:
         flash("Collection not found.", "error")
         return redirect(url_for("home"))
     releases = [
-        #mock_data.RELEASES_BY_ID[rid]
-        get_releases_by_id()[rid]
+        db.get_releases_by_id()[rid]
         for rid in collection["release_ids"]
-        if rid in get_releases_by_id()
+        if rid in db.get_releases_by_id()
     ]
     stats = {
         "total_tracks": sum(len(r["tracks"]) for r in releases),
@@ -123,8 +126,7 @@ def help():
 
 @app.route("/browse")
 def browse():
-    return render_template("browse.html", releases=get_releases())
-
+    return render_template("browse.html", releases=db.get_releases())
 
 # @app.route("/help")
 # def help():
@@ -353,57 +355,140 @@ def get_tracks(album):
         if(genres_list[-1] == g):
             genres += g
         else:
-            genres += f"{g}, "
+            flash("Error adding release", "error")
+            return render_template("add.html")
+    return render_template("add.html")
+
+@app.route("/release/<int:release_id>/delete", methods=["GET", "POST"])
+def delete(release_id):
+    release = db.get_releases_by_id().get(release_id)
+    if release is None:
+        flash("Release was not found", "error")
+        return redirect(url_for("home"))
     
-    return tracks, genres
+    if request.method == "POST":
+        title = release["title"]
+        contributors = release["contributors"]
+        try:
+            db._cur.execute(f"DELETE FROM releases WHERE title = '{title}' AND contributors = '{contributors}'")
+            print(db._conn.commit())
+            flash(f"Release '{title}' was deleted.", "success")
+            return redirect(url_for("home"))
+        except Exception as e:
+            print(f"DELETE ERROR: {e}")
+            flash(f"Error deleting release", "error")
+            db._conn.rollback()
+            return redirect(url_for("home"))
+    return render_template("delete.html", release=release)
 
-
-def get_users():
-    """Returns list of dictionaries containing all user information"""
-    u_tbl = db.select(tbls="users")
-    user_list = []
-
-    for u in u_tbl:
-        udict = {
-            "username": u[1],
-            "password":      u[0],
-            "email":    u[2],
-        }
-        user_list.append(udict)
-
-    return user_list
-
-
-def get_user_collections(uid="-1", username="none"):
-    """Returns all collections belonging to user with inputted uid or username"""
-
-    col_list = []
-    if uid == -1 and username == "none":
-        return
-    elif username == "none": # search by u_id
-        collection_ids = db.select(rows="c_id", tbls="collection", pred=f"u_id = {uid}")
-
-        for id in collection_ids:
-            col = get_collections(id[0])[0]     # id is a tuple w/ 1 elem; get_collections returns a list of dictionaries.
-            col_list.append(col)
-    else: # search by username
-        collection_ids = db.query(
-            f"""
-            SELECT c_id
-            FROM collection JOIN users ON collection.u_id = users.u_id
-            WHERE username = '{username}'
-            """)
-
-        for id in collection_ids:
-            col = get_collections(id[0])[0]
-            col_list.append(col)
+@app.route("/release/<int:release_id>/edit", methods=["GET", "POST"])
+def edit(release_id):
+    release = db.get_releases_by_id().get(release_id)
+    if release is None:
+        flash("Release was not found", "error")
+        return redirect(url_for("home"))
     
-    return col_list
+    if request.method == "POST":
+        org_title = release["title"]
+        org_contributors = release["contributors"]
+        
+        title = request.form.get("title", "").strip()
+        contributors = request.form.get("contributors", "").strip()
+        r_type = request.form.get("r_type", "")
+        r_format = request.form.get("format", "")
+        r_date = request.form.get("r_date", "")
+        r_label = request.form.get("r_label", "").strip()
+        cover = request.form.get("cover", "").strip()
+        details = request.form.get("details", "").strip()
+        
+        if not title or not contributors or not r_type or not r_format or not r_date or not r_label:
+            flash("All required fields must be filled out", "error")
+            return render_template("edit.html", release=release)
+        
+        try:
+            db._cur.execute(
+                f"UPDATE releases SET "
+                f"title = '{title}', contributors = '{contributors}', "
+                f"r_type = '{r_type}', format = '{r_format}', "
+                f"r_date = '{r_date}', r_label = '{r_label}', "
+                f"cover = '{cover}', details = '{details}' "
+                f"WHERE title = '{org_title}' AND contributors = '{org_contributors}'" 
+            )
+            db._conn.commit()
+            flash(f"Release '{title}' was updated.", "success")
+            return redirect(url_for("home"))
+        except Exception as e:
+            print(f"UPDATE ERROR: {e}")
+            flash("Error updating release", "error")
+            db._conn.rollback()
+            return redirect(url_for("home"))
+    return render_template("edit.html", release = release)
+
+
+@app.route("/release/<int:release_id>/add_to_collection", methods=["POST"])
+def add_to_collection(release_id):
+    if not session.get("username"):
+        flash("Please log in to add to a collection.", "error")
+        return redirect(url_for("login"))
+    c_id = request.form.get("c_id", type=int)
+    release = db.get_releases_by_id().get(release_id)
+    if release is None or c_id is None:
+        flash("Invalid request.", "error")
+        return redirect(url_for("home"))
+    success = db.add_release_to_collection(c_id, release["title"], release["contributors"])
+    if success:
+        flash(f"Added \"{release['title']}\" to collection.", "success")
+    else:
+        flash("Could not add — release may already be in that collection or has no group entry.", "error")
+    return redirect(request.referrer or url_for("home"))
+
+
+@app.route("/collection/new", methods=["POST"])
+def new_collection():
+    if not session.get("username"):
+        flash("Please log in.", "error")
+        return redirect(url_for("login"))
+    uid_row = db.query(f"SELECT u_id FROM users WHERE username = '{session['username']}'")
+    if not uid_row:
+        flash("User not found.", "error")
+        return redirect(url_for("home"))
+    success = _new_collection(uid_row[0][0])
+    if success:
+        flash("New collection created!", "success")
+    return redirect(url_for("home"))
+
+
+@app.route("/collection/<int:c_id>/remove/<int:release_id>", methods=["POST"])
+def remove_from_collection(c_id, release_id):
+    if not session.get("username"):
+        flash("Please log in.", "error")
+        return redirect(url_for("login"))
+    release = db.get_releases_by_id().get(release_id)
+    if release is None:
+        flash("Release not found.", "error")
+        return redirect(url_for("collection_detail", c_id=c_id))
+    success = db.remove_release_from_collection(c_id, release["title"], release["contributors"])
+    if success:
+        flash(f"Removed \"{release['title']}\" from collection.", "success")
+    else:
+        flash("Error removing release from collection.", "error")
+    return redirect(url_for("collection_detail", c_id=c_id))
+
+
+def _new_collection(uid):
+    new_cid = db.query("SELECT MAX(c_id) FROM collection")[0][0] + 1
+    try:
+        db._cur.execute(f"INSERT INTO collection(c_id, u_id) VALUES ({new_cid}, {uid})")
+        db._conn.commit()
+        return True
+    except:
+        flash("Issue creating collection.", "error")
+        db._conn.rollback()
+        return False
 
 
 if __name__ == "__main__":
     # macOS reserves port 5000 for AirPlay Receiver, so default to 5001.
     db.init_db()
-
     port = int(os.environ.get("FLASK_PORT", 5001))
     app.run(debug=True, port=port)

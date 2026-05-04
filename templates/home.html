@@ -21,7 +21,7 @@
 <section class="search-panel">
     <fieldset>
         <legend>Search</legend>
-        <form onsubmit="event.preventDefault(); alert('Search is not wired up yet.');">
+        <form id="search-form" onsubmit="return false;">
             <div class="field-row">
                 <label for="q">Find a release:</label>
                 <input id="q" type="text" placeholder="Title, artist, label...">
@@ -55,7 +55,19 @@
                 </div>
                 <div class="window-body">
                     <p>Start a new collection.</p>
-                    <button>Create</button>
+                    <button id="new-col-btn" type="button"
+                        onclick="document.getElementById('new-col-form').style.display='block'; this.style.display='none'">
+                        Create
+                    </button>
+                    <div id="new-col-form" style="display:none">
+                        <form action="{{ url_for('new_collection') }}" method="post">
+                            <button type="submit">Confirm</button>
+                            <button type="button"
+                                onclick="document.getElementById('new-col-form').style.display='none'; document.getElementById('new-col-btn').style.display=''">
+                                Cancel
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -73,7 +85,8 @@
         {% endif %}
         <div class="release-grid">
             {% for r in releases %}
-                <div class="window release-card">
+                <div class="window release-card"
+                     data-search="{{ (r.title ~ ' ' ~ r.contributors ~ ' ' ~ r.r_label ~ ' ' ~ r.genre) | lower }}">
                     <div class="title-bar">
                         <div class="title-bar-text">{{ r.title }}</div>
                     </div>
@@ -91,7 +104,24 @@
                                 <button>Details</button>
                             </a>
                             {% if current_user %}
-                                <button>Add to Collection</button>
+                                <button id="atc-btn-{{ r.id }}" type="button"
+                                    onclick="document.getElementById('atc-{{ r.id }}').style.display='block'; this.style.display='none'">
+                                    Add to Collection
+                                </button>
+                                <div id="atc-{{ r.id }}" style="display:none; margin-top:4px">
+                                    <form action="{{ url_for('add_to_collection', release_id=r.id) }}" method="post">
+                                        <select name="c_id" style="width:100%; margin-bottom:4px">
+                                            {% for c in collections %}
+                                            <option value="{{ c.c_id }}">{{ c.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button type="submit">Add</button>
+                                        <button type="button"
+                                            onclick="document.getElementById('atc-{{ r.id }}').style.display='none'; document.getElementById('atc-btn-{{ r.id }}').style.display=''">
+                                            Cancel
+                                        </button>
+                                    </form>
+                                </div>
                             {% endif %}
                         </div>
                     </div>
@@ -100,4 +130,17 @@
         </div>
     </fieldset>
 </section>
+<script>
+(function () {
+    var input = document.getElementById('q');
+    function filter() {
+        var q = input.value.trim().toLowerCase();
+        document.querySelectorAll('.release-card').forEach(function (card) {
+            card.style.display = (!q || card.dataset.search.includes(q)) ? '' : 'none';
+        });
+    }
+    input.addEventListener('input', filter);
+    document.getElementById('search-form').addEventListener('submit', filter);
+})();
+</script>
 {% endblock %}

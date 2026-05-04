@@ -27,7 +27,26 @@
                 <div class="title-bar-text">Actions</div>
             </div>
             <div class="window-body">
-                <p><button style="width:100%">Add to Collection</button></p>
+                <p>
+                    <button id="atc-btn-detail" type="button" style="width:100%"
+                        onclick="document.getElementById('atc-detail').style.display='block'; this.style.display='none'">
+                        Add to Collection
+                    </button>
+                    <div id="atc-detail" style="display:none">
+                        <form action="{{ url_for('add_to_collection', release_id=release.id) }}" method="post">
+                            <select name="c_id" style="width:100%; margin-bottom:4px">
+                                {% for c in collections %}
+                                <option value="{{ c.c_id }}">{{ c.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" style="width:100%">Add</button>
+                            <button type="button" style="width:100%"
+                                onclick="document.getElementById('atc-detail').style.display='none'; document.getElementById('atc-btn-detail').style.display=''">
+                                Cancel
+                            </button>
+                        </form>
+                    </div>
+                </p>
                 <p><button style="width:100%">Mark as Owned</button></p>
                 <p><a href="{{ url_for('edit', release_id=release.id) }}"><button style="width:100%">Edit</button></a></p>
                 <p><a href="{{ url_for('delete', release_id=release.id) }}"><button style="width:100%; background: #c33; color: white;">Delete</button></a></p>

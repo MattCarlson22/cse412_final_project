@@ -6,7 +6,7 @@
     <section class="search-panel">
         <fieldset>
             <legend>Search</legend>
-            <form onsubmit="event.preventDefault(); alert('Search is not wired up yet.');">
+            <form id="search-form" onsubmit="return false;">
                 <div class="field-row">
                     <label for="q">Find a release:</label>
                     <input id="q" type="text" placeholder="Title, artist, label...">
@@ -18,7 +18,8 @@
     <legend>Browse Releases</legend>
     <div class="release-grid">
         {% for release in releases %}
-        <div class="release-card">
+        <div class="release-card"
+             data-search="{{ (release.title ~ ' ' ~ release.contributors ~ ' ' ~ release.r_label ~ ' ' ~ release.genre) | lower }}">
             <img src="{{ release.cover }}" alt="{{ release.title }} cover" class="release-cover">
             <div class="release-info">
                 <h3>{{ release.title }}</h3>
@@ -34,5 +35,18 @@
         {% endfor %}
     </div>
 </fieldset>
+<script>
+(function () {
+    var input = document.getElementById('q');
+    function filter() {
+        var q = input.value.trim().toLowerCase();
+        document.querySelectorAll('.release-card').forEach(function (card) {
+            card.style.display = (!q || card.dataset.search.includes(q)) ? '' : 'none';
+        });
+    }
+    input.addEventListener('input', filter);
+    document.getElementById('search-form').addEventListener('submit', filter);
+})();
+</script>
 {% endblock %}
 {% block status_left %}Browsing releases{% endblock %}
