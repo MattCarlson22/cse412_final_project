@@ -113,9 +113,9 @@ def collection_detail(c_id):
     }
     return render_template("collection.html", collection=collection,
                            releases=releases, stats=stats)
-# @app.route("/browse")
-# def browse():
-#     return render_template("browse.html", releases=mock_data.RELEASES)
+@app.route("/browse")
+def browse():
+    return render_template("browse.html", releases=mock_data.RELEASES)
 
 @app.route("/help")
 def help():
