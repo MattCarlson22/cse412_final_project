@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Track — Music Library{% endblock %}
+{% block window_title %}Edit Track{% endblock %}
+{% block status_left %}Edit a track on {{ release.title }}{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="window auth-dialog">
+        <div class="title-bar">
+            <div class="title-bar-text">Edit Track</div>
+            <div class="title-bar-controls">
+                <button aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="window-body">
+            <form method="post" action="">
+                <fieldset>
+                    <legend>Track details</legend>
+                    <div class="field-row-stacked">
+                        <label for="title">Track Title</label>
+                        <input id="title" name="title" type="text" required autofocus
+                               value="{{ track.title }}">
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="t_num">Track Number</label>
+                        <input id="t_num" name="t_num" type="number" min="1" required
+                               value="{{ track.t_num }}">
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="duration">Duration (seconds)</label>
+                        <input id="duration" name="duration" type="number" min="1" required
+                               value="{{ track.duration }}">
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="genre">Genre</label>
+                        <input id="genre" name="genre" type="text" required
+                               value="{{ track.genre }}">
+                    </div>
+                    <div class="field-row-stacked">
+                        <label for="features">Features (optional)</label>
+                        <input id="features" name="features" type="text"
+                               value="{{ track.features }}">
+                    </div>
+                </fieldset>
+                <section class="auth-actions">
+                    <button type="submit">Save Changes</button>
+                    <a href="{{ url_for('release_detail', release_id=release.id) }}"><button type="button">Cancel</button></a>
+                </section>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
