@@ -7,6 +7,7 @@ Flask frontend for the CSE 412 music library project (Phase 3). Currently uses m
 **Prerequisites:** Python 3.9+
 
 ```bash
+# 0. Create a PostgreSQL database.
 # 1. Create and activate a virtual environment
 python3 -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
