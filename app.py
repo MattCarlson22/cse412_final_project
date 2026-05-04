@@ -126,9 +126,9 @@ def browse():
     return render_template("browse.html", releases=get_releases())
 
 
-@app.route("/help")
-def help():
-    return render_template("help.html")
+# @app.route("/help")
+# def help():
+#     return render_template("help.html")
 
 
 @app.route("/logout", methods=["POST"])
@@ -137,6 +137,98 @@ def logout():
     flash("You have been logged out.", "success")
     return redirect(url_for("home"))
 
+
+@app.route("/release/add", methods=["GET", "POST"])
+def add():
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        contributors = request.form.get("contributors", "").strip()
+        r_type = request.form.get("r_type", "")
+        r_format = request.form.get("format", "")
+        r_date = request.form.get("r_date", "")
+        r_label = request.form.get("r_label", "").strip()
+        cover = request.form.get("cover", "").strip()
+        details = request.form.get("details", "").strip()
+        
+        if not title or not contributors or not r_type or not r_format or not r_date or not r_label:
+            flash("All required fields must be filled out", "error")
+            return render_template("add.html")
+
+        good_insert = db.insert(
+            "releases",
+            f"'{title}', '{contributors}', '{r_type}', '{r_format}', '{r_date}', '{r_label}', '{cover}', '{details}' "
+        )
+        
+        if good_insert:
+            flash(f"Release '{title}' added to library!", "success")
+            return redirect(url_for("home"))
+        else:
+            flash("Error adding release", "error")
+            return render_template("add.html")
+    return render_template("add.html")
+
+@app.route("/release/<int:release_id>/delete", methods=["GET", "POST"])
+def delete(release_id):
+    release = get_releases_by_id().get(release_id)
+    if release is None:
+        flash("Release was not found", "error")
+        return redirect(url_for("home"))
+    
+    if request.method == "POST":
+        title = release["title"]
+        contributors = release["contributors"]
+        try:
+            db._cur.execute(f"DELETE FROM releases WHERE title = '{title}' AND contributors = '{contributors}'")
+            db._conn.commit()
+            flash(f"Release '{title}' was deleted.", "success")
+            return redirect(url_for("home"))
+        except Exception as e:
+            print(f"DELETE ERROR: {e}")
+            flash(f"Error deleting release", "error")
+            return redirect(url_for("home"))
+    return render_template("delete.html", release=release)
+
+@app.route("/release/<int:release_id>/edit", methods=["GET", "POST"])
+def edit(release_id):
+    release = get_releases_by_id().get(release_id)
+    if release is None:
+        flash("Release was not found", "error")
+        return redirect(url_for("home"))
+    
+    if request.method == "POST":
+        org_title = release["title"]
+        org_contributors = release["contributors"]
+        
+        title = request.form.get("title", "").strip()
+        contributors = request.form.get("contributors", "").strip()
+        r_type = request.form.get("r_type", "")
+        r_format = request.form.get("format", "")
+        r_date = request.form.get("r_date", "")
+        r_label = request.form.get("r_label", "").strip()
+        cover = request.form.get("cover", "").strip()
+        details = request.form.get("details", "").strip()
+        
+        if not title or not contributors or not r_type or not r_format or not r_date or not r_label:
+            flash("All required fields must be filled out", "error")
+            return render_template("edit.html", release=release)
+        
+        try:
+            db._cur.execute(
+                f"UPDATE releases SET "
+                f"title = '{title}', contributors = '{contributors}', "
+                f"r_type = '{r_type}', format = '{r_format}', "
+                f"r_date = '{r_date}', r_label = '{r_label}', "
+                f"cover = '{cover}', details = '{details}' "
+                f"WHERE title = '{org_title}' AND contributors = '{org_contributors}'" 
+            )
+            db._conn.commit()
+            flash(f"Release '{title}' was updated.", "success")
+            return redirect(url_for("home"))
+        except Exception as e:
+            print(f"UPDATE ERROR: {e}")
+            flash("Error updating release", "error")
+            return redirect(url_for("home"))
+    return render_template("edit.html", release = release)
 
 def get_collections(cid=-1):
     """takes an optional input of a collection id, and returns either that collection id or all collections."""

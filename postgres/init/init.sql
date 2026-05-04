@@ -45,7 +45,8 @@ CREATE TABLE IF NOT EXISTS MusicGroup
  PRIMARY KEY(title, r_title, r_contributors),
  FOREIGN KEY(r_title, r_contributors)
    REFERENCES Releases(title, contributors)
-   ON DELETE CASCADE);
+   ON DELETE CASCADE
+   ON UPDATE CASCADE);
 
 CREATE TABLE IF NOT EXISTS Creates
 (g_id INT NOT NULL,
@@ -55,7 +56,8 @@ CREATE TABLE IF NOT EXISTS Creates
  FOREIGN KEY(g_id)
    REFERENCES MusicGroup,
  FOREIGN KEY (title, contributors)
-   REFERENCES Releases);
+   REFERENCES Releases
+   ON UPDATE CASCADE);
 
 CREATE TABLE IF NOT EXISTS Has
 (g_id INT NOT NULL,
